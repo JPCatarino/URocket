@@ -15,14 +15,16 @@ import java.util.List;
 
 public class Flight {
     private Timestamp launch_timestamp;
+    private String name;
     private DocumentReference rocket;
     private List<Telemetry> telemetry;
 
     public Flight() {
     }
 
-    public Flight(Timestamp launch_timestamp, DocumentReference rocket, List<Telemetry> telemetry) {
+    public Flight(Timestamp launch_timestamp, String name, DocumentReference rocket, List<Telemetry> telemetry) {
         this.launch_timestamp = launch_timestamp;
+        this.name = name;
         this.rocket = rocket;
         this.telemetry = telemetry;
     }
@@ -34,6 +36,10 @@ public class Flight {
     public String getPrettyLaunch_timestamp() {
         SimpleDateFormat simpleDate =  new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
         return simpleDate.format(launch_timestamp.toDate());
+    }
+
+    public String getName() {
+        return name;
     }
 
     public DocumentReference getRocket() {

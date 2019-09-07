@@ -30,6 +30,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -42,8 +43,12 @@ import com.jaagora.urocket.MainActivity;
 import com.jaagora.urocket.R;
 import com.jaagora.urocket.lib.Flight;
 import com.jaagora.urocket.lib.FlightHolder;
+import com.jaagora.urocket.ui.bluetooth.BluetoothPairActivity;
+import com.jaagora.urocket.ui.bluetooth.BluetoothSyncActivity;
 
 import java.util.ArrayList;
+
+import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 
 public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
@@ -66,13 +71,14 @@ public class HomeFragment extends Fragment {
         final Context c = getActivity();
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
 
+        final FloatingActionButton fab_sync = root.findViewById(R.id.fab_sync);
+
         final Spinner rocket_spinner = root.findViewById(R.id.rocket_spinner);
         final ArrayList<String> spinner_elements = new ArrayList<>();
         final ArrayList<DocumentReference> spinner_refs = new ArrayList<>();
 
         final RecyclerView flights_view = root.findViewById(R.id.flights_view_rv);
         LinearLayoutManager flights_layoutManager = new LinearLayoutManager(c);
-        FirestoreRecyclerAdapter adapter;
         flights_layoutManager.setReverseLayout(true);
         flights_layoutManager.setStackFromEnd(true);
         flights_view.setLayoutManager(flights_layoutManager);
@@ -90,41 +96,59 @@ public class HomeFragment extends Fragment {
                                 spinner_elements.add((String) document.getData().get("name"));
                                 spinner_refs.add(document.getReference());
                             }
+                            spinner_elements.add("Register new Rocket");
+                            spinner_refs.add(null);
 
                             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(c, android.R.layout.simple_spinner_item, spinner_elements);
                             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             rocket_spinner.setAdapter(arrayAdapter);
                             rocket_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
-                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
 
-                                    Log.d("DevDebug", "at onItemSelected. " + spinner_refs.get(position));
-                                    CollectionReference flightsRef = db.collection("flights");
-                                    Query baseQuery = flightsRef.whereEqualTo("rocket", spinner_refs.get(position));
+                                    if (spinner_refs.get(position) != null) {
+                                        CollectionReference flightsRef = db.collection("flights");
+                                        Query baseQuery = flightsRef.whereEqualTo("rocket", spinner_refs.get(position))\1;
 
-                                    FirestoreRecyclerOptions<Flight> options = new FirestoreRecyclerOptions.Builder<Flight>()
-                                            .setQuery(baseQuery, Flight.class)
-                                            .build();
+                                        FirestoreRecyclerOptions<Flight> options = new FirestoreRecyclerOptions.Builder<Flight>()
+                                                .setQuery(baseQuery, Flight.class)
+                                                .build();
 
-                                    FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<Flight, FlightHolder>(options) {
+                                        FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<Flight, FlightHolder>(options) {
+                                            @Override
+                                            public void onBindViewHolder(FlightHolder holder, int position, Flight flight) {
+                                                holder.launch_timestamp.setText(flight.getPrettyLaunch_timestamp());
+                                                holder.flight_name.setText(flight.getName());
+                                            }
+
+                                            @Override
+                                            public FlightHolder onCreateViewHolder(ViewGroup group, int i) {
+
+                                                View view = LayoutInflater.from(group.getContext())
+                                                        .inflate(R.layout.flight_list_item, group, false);
+
+                                                return new FlightHolder(view);
+                                            }
+                                        };
+
+                                        adapter.notifyDataSetChanged();
+                                        flights_view.setAdapter(adapter);
+                                        if (adapter != null) adapter.startListening();
+                                    }
+                                    else {
+                                        startActivity(new Intent(c, BluetoothPairActivity.class));
+                                        getActivity().finish();
+                                    }
+
+                                    fab_sync.setOnClickListener(new View.OnClickListener() {
                                         @Override
-                                        public void onBindViewHolder(FlightHolder holder, int position, Flight flight) {
-                                            holder.launch_timestamp.setText(flight.getPrettyLaunch_timestamp());
+                                        public void onClick(View v) {
+                                            Intent intent = new Intent(c, BluetoothSyncActivity.class);
+                                            intent.putExtra("rocket", spinner_refs.get(position).getId());
+                                            startActivity(intent);
+                                            getActivity().finish();
                                         }
-
-                                        @Override
-                                        public FlightHolder onCreateViewHolder(ViewGroup group, int i) {
-
-                                            View view = LayoutInflater.from(group.getContext())
-                                                    .inflate(R.layout.flight_list_item, group, false);
-
-                                            return new FlightHolder(view);
-                                        }
-                                    };
-
-                                    adapter.notifyDataSetChanged();
-                                    flights_view.setAdapter(adapter);
-                                    if (adapter != null) adapter.startListening();
+                                    });
                                 }
 
                                 @Override
@@ -134,6 +158,7 @@ public class HomeFragment extends Fragment {
                         } else {
                             Log.d("DevDebug", "Error getting documents: ", task.getException());
                         }
+
                     }
                 });
 
