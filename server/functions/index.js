@@ -25,7 +25,7 @@ exports.addNewRocket = functions.https.onCall((data) => {
     
     let reference = admin.firestore().doc('users/' + data.owner);
        
-    admin.firestore().collection('rockets').add({owner: reference, name: data.name, is_public: data.is_public}).then(function(){return {res:'OK'}});
+    admin.firestore().collection('rockets').add({owner: reference, name: data.name, is_public: data.is_public, address: data.address}).then(function(){return {res:'OK'}});
 });
 
 exports.addNewFlightC = functions.https.onRequest(async (req, res) => {
@@ -42,7 +42,7 @@ exports.addNewFlightC = functions.https.onRequest(async (req, res) => {
 
 exports.addNewFlight = functions.https.onCall((data) => {
     // res.send(data[1]._id);
-    admin.firestore().collection('flights').add({launch_timestamp: data.launch_timestamp, rocket: admin.firestore().doc('rockets/' + data.rocket), telemetry: data.telemetry}).then(function(){return {res:'OK'}});
+    admin.firestore().collection('flights').add({name: data.name, launch_timestamp: admin.firestore.Timestamp.fromDate(new Date(data.launch_timestamp)), rocket: admin.firestore().doc('rockets/' + data.rocket), telemetry: data.telemetry}).then(function(){return {res:'OK'}});
 });
 
 exports.addNewUser = functions.auth.user().onCreate((user) => {
