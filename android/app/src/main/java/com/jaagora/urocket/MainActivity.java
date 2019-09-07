@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
-                        .setLogo(R.drawable.ic_launcher_foreground)      // Set logo drawable
+                        .setLogo(R.mipmap.ic_launcher_foreground)      // Set logo drawable
                         .setTheme(R.style.AppTheme)      // Set theme
                         .build(),
                 RC_SIGN_IN);
