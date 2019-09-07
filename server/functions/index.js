@@ -16,7 +16,7 @@ exports.addNewRocket = functions.https.onRequest(async (req, res) => {
     
     let reference = admin.firestore().doc('users/' + data.owner)
        
-    admin.firestore().collection('rockets').add({owner: reference, name: data.name}).then(function(){res.send('OK').status(200)});
+    admin.firestore().collection('rockets').add({owner: reference, name: data.name, is_public: data.is_public}).then(function(){res.send('OK').status(200)});
 });
 
 exports.addNewFlight = functions.https.onRequest(async (req, res) => {
