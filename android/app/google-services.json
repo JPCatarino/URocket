@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "123882125461",
+    "firebase_url": "https://urocket-9e638.firebaseio.com",
+    "project_id": "urocket-9e638",
+    "storage_bucket": "urocket-9e638.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123882125461:android:8e7332058916a5193f839c",
+        "android_client_info": {
+          "package_name": "com.jaagora.urocket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "123882125461-sr1imvcmig1png0qfu20rp9n3tf487mv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jaagora.urocket",
+            "certificate_hash": "8562765480ffe56b92c2bfc52664aa232ac6816b"
+          }
+        },
+        {
+          "client_id": "123882125461-0p6tlevkslmqikbsu3nv7qt097fseojo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARJjPGpAtMLI75TC9UhrR9ObhlJoDq6U8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "123882125461-0p6tlevkslmqikbsu3nv7qt097fseojo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
