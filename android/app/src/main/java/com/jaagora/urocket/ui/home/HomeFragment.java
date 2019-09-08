@@ -45,6 +45,7 @@ import com.jaagora.urocket.lib.Flight;
 import com.jaagora.urocket.lib.FlightHolder;
 import com.jaagora.urocket.ui.bluetooth.BluetoothPairActivity;
 import com.jaagora.urocket.ui.bluetooth.BluetoothSyncActivity;
+import com.jaagora.urocket.ui.flight.FlightActivity;
 
 import java.util.ArrayList;
 
@@ -108,7 +109,7 @@ public class HomeFragment extends Fragment {
 
                                     if (spinner_refs.get(position) != null) {
                                         CollectionReference flightsRef = db.collection("flights");
-                                        Query baseQuery = flightsRef.whereEqualTo("rocket", spinner_refs.get(position))\1;
+                                        Query baseQuery = flightsRef.whereEqualTo("rocket", spinner_refs.get(position));
 
                                         FirestoreRecyclerOptions<Flight> options = new FirestoreRecyclerOptions.Builder<Flight>()
                                                 .setQuery(baseQuery, Flight.class)
@@ -116,7 +117,15 @@ public class HomeFragment extends Fragment {
 
                                         FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<Flight, FlightHolder>(options) {
                                             @Override
-                                            public void onBindViewHolder(FlightHolder holder, int position, Flight flight) {
+                                            public void onBindViewHolder(final FlightHolder holder, final int position, final Flight flight) {
+                                                holder.flight_card.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        Intent intent = new Intent(c, FlightActivity.class);
+                                                        intent.putExtra("flight", getSnapshots().getSnapshot(position).getId());
+                                                        startActivity(intent);
+                                                    }
+                                                });
                                                 holder.launch_timestamp.setText(flight.getPrettyLaunch_timestamp());
                                                 holder.flight_name.setText(flight.getName());
                                             }
@@ -131,13 +140,16 @@ public class HomeFragment extends Fragment {
                                             }
                                         };
 
+
+
                                         adapter.notifyDataSetChanged();
                                         flights_view.setAdapter(adapter);
                                         if (adapter != null) adapter.startListening();
                                     }
                                     else {
+                                        rocket_spinner.setSelection(0);
                                         startActivity(new Intent(c, BluetoothPairActivity.class));
-                                        getActivity().finish();
+                                        //getActivity().finish();
                                     }
 
                                     fab_sync.setOnClickListener(new View.OnClickListener() {
@@ -146,7 +158,7 @@ public class HomeFragment extends Fragment {
                                             Intent intent = new Intent(c, BluetoothSyncActivity.class);
                                             intent.putExtra("rocket", spinner_refs.get(position).getId());
                                             startActivity(intent);
-                                            getActivity().finish();
+                                            //getActivity().finish();
                                         }
                                     });
                                 }
