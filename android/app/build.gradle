@@ -20,6 +20,10 @@ android {
     }
 }
 
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'
@@ -38,6 +42,7 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'android.arch.paging:runtime:1.0.0'
     implementation 'com.akexorcist:bluetoothspp:1.0.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
