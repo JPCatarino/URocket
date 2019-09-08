@@ -14,7 +14,7 @@
 
 #define READING_INTERVAL 50
 #define MOVEMENT_THRESHOLD 0.2
-#define COUNTER_THRESHOLD 10
+#define COUNTER_THRESHOLD 30
 #define BUFFER_SIZE 20
 
 auto constexpr DATA_FILE = "/data.txt";
