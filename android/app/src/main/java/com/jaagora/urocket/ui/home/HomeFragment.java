@@ -147,8 +147,9 @@ public class HomeFragment extends Fragment {
                                         if (adapter != null) adapter.startListening();
                                     }
                                     else {
+                                        rocket_spinner.setSelection(0);
                                         startActivity(new Intent(c, BluetoothPairActivity.class));
-                                        getActivity().finish();
+                                        //getActivity().finish();
                                     }
 
                                     fab_sync.setOnClickListener(new View.OnClickListener() {
@@ -157,7 +158,7 @@ public class HomeFragment extends Fragment {
                                             Intent intent = new Intent(c, BluetoothSyncActivity.class);
                                             intent.putExtra("rocket", spinner_refs.get(position).getId());
                                             startActivity(intent);
-                                            getActivity().finish();
+                                            //getActivity().finish();
                                         }
                                     });
                                 }

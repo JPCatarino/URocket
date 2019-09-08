@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -80,7 +81,6 @@ public class BluetoothSyncActivity extends AppCompatActivity {
         bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
             public void onDeviceConnected(String name, String address) {
                 Log.d("DEVDEBUG", "onConnect");
-                attempting.setText("Connection successful\n      Transferring data");
                 bt.send("[" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "]", true);
             }
 
@@ -104,6 +104,7 @@ public class BluetoothSyncActivity extends AppCompatActivity {
             public void onDataReceived(byte[] data, String message) {
                 Log.d("DEVDEBUG", "BT Received: " + message);
                 if (message.length() >= 9 && message.substring(0, 9).equals("Connected")) {
+                    attempting.setText("Connection successful\n      Transferring data");
                     bt.send("[" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "]", true);
                 } else if (message.length() >= 4 && message.substring(0, 4).equals("NULL")) {
                     showEmpty();
@@ -252,6 +253,28 @@ public class BluetoothSyncActivity extends AppCompatActivity {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         df.setTimeZone(tz);
         return df.format(date);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if ((keyCode == KeyEvent.KEYCODE_BACK))
+        {
+            Log.d("DEVDEBUG", "Back press detected on BluetoothSyncActivity");
+            //bt.stopService();
+            finish();
+            //onDestroy();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("DEVDEBUG", "DESTROYING BluetoothSyncActivity");
+        bt.setBluetoothConnectionListener(null);
+        bt.setOnDataReceivedListener(null);
+        bt.stopService();
+        super.onDestroy();
     }
 }
 

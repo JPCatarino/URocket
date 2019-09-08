@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -92,6 +93,9 @@ public class BluetoothPairActivity extends AppCompatActivity {
                 Log.d("DEVDEBUG", bt.toString());
                 bt.connect(data);
             }
+            else{
+                finish();
+            }
         } else if (requestCode == BluetoothState.REQUEST_ENABLE_BT) {
             startActivity(new Intent(this, BluetoothPairActivity.class));
             finish();
@@ -160,6 +164,28 @@ public class BluetoothPairActivity extends AppCompatActivity {
 
         loading.setVisibility(View.GONE);
         pair_success.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if ((keyCode == KeyEvent.KEYCODE_BACK))
+        {
+            Log.d("DEVDEBUG", "Back press detected on BluetoothPairActivity");
+            //bt.stopService();
+            finish();
+            //onDestroy();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("DEVDEBUG", "DESTROYING BluetoothPairActivity");
+        bt.setBluetoothConnectionListener(null);
+        bt.setOnDataReceivedListener(null);
+        bt.stopService();
+        super.onDestroy();
     }
 }
 
