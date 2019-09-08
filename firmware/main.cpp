@@ -17,19 +17,7 @@
 #define COUNTER_THRESHOLD 30
 #define BUFFER_SIZE 20
 
-auto constexpr DATA_FILE = "/data.txt";
-
-char* concat(char* first, char* second) {
-  char* retVal = (char*)(calloc(strlen(first)+strlen(second)+1,sizeof(char)));
-  strcpy(retVal,first);
-  strcat(retVal,second);
-  return retVal;
-}
-
-char* putStrInPointer(char* pointer, const char * str) {
-  char* temp = (char*)(calloc(strlen(str)+1,sizeof(char)));
-  return concat(pointer,temp);
-}
+auto constexpr DATA_FILE = "/data.bin";
 
 bool isMoving = false;
 float baseAcc;
@@ -47,7 +35,7 @@ BluetoothSerial SerialBT;
 
 CircularBuffer<Reading, BUFFER_SIZE> buffer;
 Flight flight;
-bool isReadyToTransmit = false;
+bool isReadyToTransmit;
 
 long timer = 0;
 String uid = "";
@@ -139,6 +127,7 @@ void sendData() {
     SerialBT.printf("OVER\n\r");
   }
 }
+
 void sendError() {
   SerialBT.printf("ERROR\n\r");
 }
@@ -156,6 +145,9 @@ void setup() {
   mpu.calcGyroOffsets(true);
   Serial.print("\n");
   baseAcc = getTotalAcceleration();
+  SPIFFS.begin();
+  isReadyToTransmit = SPIFFS.exists(DATA_FILE);
+  SPIFFS.end();
 }
 
 void loop() {
