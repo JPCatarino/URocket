@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="50dp"
             android:layout_marginTop="32dp"
-            android:text="Max Acceleration"
+            android:text="Max. Acceleration"
             app:layout_constraintStart_toEndOf="@+id/textView7"
             app:layout_constraintTop_toBottomOf="@+id/flight_name_header" />
 
@@ -97,20 +97,40 @@
             android:id="@+id/altitude_chart"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/max_alt" />
+            app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/acceleration_chart"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Altitude (m)"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@+id/textView5"
+            app:layout_constraintTop_toBottomOf="@+id/flight_time" />
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Acceleration (m/s²)"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@+id/textView5"
             app:layout_constraintTop_toBottomOf="@+id/altitude_chart" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

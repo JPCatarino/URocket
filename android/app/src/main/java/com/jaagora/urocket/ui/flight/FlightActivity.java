@@ -102,7 +102,7 @@ public class FlightActivity extends AppCompatActivity {
                 flight_time.setText((max_timestamp_temp / 1000) + " s");
                 max_accel.setText(max_accel_temp + " m/s²");
 
-                LineDataSet alti_dataSet = new LineDataSet(alti_time, "Altitude"); // add entries to dataset
+                LineDataSet alti_dataSet = new LineDataSet(alti_time, "Time (s)"); // add entries to dataset
                 alti_dataSet.setDrawValues(false);
 
                 LineData alti_lineData = new LineData(alti_dataSet);
@@ -113,7 +113,7 @@ public class FlightActivity extends AppCompatActivity {
                 altitude_chart.getData().setHighlightEnabled(false);
                 altitude_chart.invalidate(); // refresh
 
-                LineDataSet accel_dataSet = new LineDataSet(accel_time, "Acceleration"); // add entries to dataset
+                LineDataSet accel_dataSet = new LineDataSet(accel_time, "Time (s)"); // add entries to dataset
                 //accel_dataSet.setColor(Color.GREEN);
                 //accel_dataSet.setCircleColor(Color.GREEN);
                 accel_dataSet.setDrawValues(false);
