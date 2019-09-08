@@ -3,7 +3,7 @@
 #include <Adafruit_BMP280.h>
 #include <MPU6050_tockn.h>
 #include <CircularBuffer.h>
-#include <FS.h>
+#include "FS.h"
 #include "SPIFFS.h"
 #include "BluetoothSerial.h"
 #include "Reading.h"
@@ -16,7 +16,8 @@
 #define MOVEMENT_THRESHOLD 0.2
 #define COUNTER_THRESHOLD 10
 #define BUFFER_SIZE 20
-#define DATA_FILE "readings.txt"
+
+auto constexpr DATA_FILE = "/data.txt";
 
 char* concat(char* first, char* second) {
   char* retVal = (char*)(calloc(strlen(first)+strlen(second)+1,sizeof(char)));
@@ -32,7 +33,9 @@ char* putStrInPointer(char* pointer, const char * str) {
 
 bool isMoving = false;
 float baseAcc;
+float baseAlt;
 uint8_t counter = 0;
+uint32_t timerAdjustment = 0;
 
 byte address [126];
 byte nDevices = 0;
@@ -43,7 +46,7 @@ MPU6050 mpu(Wire);
 BluetoothSerial SerialBT;
 
 CircularBuffer<Reading, BUFFER_SIZE> buffer;
-std::vector <Reading> storedReadings;
+Flight flight;
 bool isReadyToTransmit = false;
 
 long timer = 0;
@@ -109,16 +112,17 @@ void sendData() {
   if(!isReadyToTransmit)
     SerialBT.printf("NULL\n\r");
   else {
+
     if(!SPIFFS.begin()){
       Serial.println("An Error has occurred while mounting SPIFFS");
       return;
     }
+
     File file = SPIFFS.open(DATA_FILE, "r");
-    Flight f;
-    f.load(file);
+    flight.load(file);
     file.close();
-    /*
-    for(Reading r : storedReadings) {
+    SPIFFS.end();
+    for(Reading r : flight.readings) {
       String str = F("{acceleration:");
       str += String(r.acceleration,2);
       str += F(",altitude:");
@@ -128,9 +132,9 @@ void sendData() {
       str += F("}\n\r");
       Serial.println(str);
       SerialBT.printf(str.c_str());
-      delay(100);
-    }*/
-    storedReadings.clear();
+      delay(10);
+    }
+    flight.readings.clear();
     delay(1000);
     SerialBT.printf("OVER\n\r");
   }
@@ -146,6 +150,7 @@ void setup() {
   if(!bmp.begin()) {
     Serial.print("Unable to initialize BMP.\n");
   }
+  baseAlt = bmp.readAltitude();
   Wire.begin();
   mpu.begin();
   mpu.calcGyroOffsets(true);
@@ -158,12 +163,23 @@ void loop() {
     timer = (uint32_t)millis();
     float acc = getTotalAcceleration();
     //Serial.println(acc);
-    if(acc>baseAcc+MOVEMENT_THRESHOLD || acc<baseAcc-MOVEMENT_THRESHOLD) {
+    if((acc>baseAcc+MOVEMENT_THRESHOLD || acc<baseAcc-MOVEMENT_THRESHOLD) && !isMoving) {
       Serial.print("Rocket is moving\n");
       isMoving = true;
       int i;
-      for(i=0; i<BUFFER_SIZE; i++)
-        storedReadings.push_back(buffer.pop());
+      Reading tempReads [BUFFER_SIZE];
+      for(i=0; i<BUFFER_SIZE; i++) {
+        tempReads[i] = buffer.pop();
+        if(i==0)
+          timerAdjustment = tempReads[0].timestamp;
+        else if(tempReads[i].timestamp<timerAdjustment)
+          timerAdjustment = tempReads[i].timestamp;
+      }
+      for(i=0; i<BUFFER_SIZE; i++) {
+        tempReads[i].timestamp -= timerAdjustment;
+        tempReads[i].altitude -= baseAlt;
+        flight.readings.push_back(tempReads[i]);
+      }
       buffer.clear();
     }
     if(isMoving) {
@@ -174,9 +190,18 @@ void loop() {
           isMoving = false;
           counter = 0;
           isReadyToTransmit = true;
+          if(!SPIFFS.begin()){
+            Serial.println("An Error has occurred while mounting SPIFFS");
+            return;
+          }
+          File file = SPIFFS.open(DATA_FILE, "w");
+          flight.save(file);
+          flight.readings.clear();
+          file.close();
+          SPIFFS.end();
         }
       }
-      storedReadings.push_back({acc,bmp.readAltitude(),timer});
+      flight.readings.push_back({acc,bmp.readAltitude()-baseAlt,timer-timerAdjustment});
     }
     else
       buffer.push({acc,bmp.readAltitude(),timer});
